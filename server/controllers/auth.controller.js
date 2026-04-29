@@ -56,6 +56,7 @@ const register = async (req, res) => {
     res.status(201).json({
       message: 'Registration successful. Check your email for the OTP.',
       userId: user._id,
+      ...(process.env.NODE_ENV !== 'production' && { devOtp: otp }),
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
