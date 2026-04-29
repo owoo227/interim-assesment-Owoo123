@@ -19,8 +19,32 @@ const { body } = require('express-validator');
 
 const app = express();
 
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // allow server-to-server / curl (no origin header) and whitelisted origins
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, origin || true);
+    } else {
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    }
+  },
+  credentials: true,
+}));
+
+// Explicit OPTIONS preflight handler for all routes
+app.options('*', cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, origin || true);
+    } else {
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    }
+  },
   credentials: true,
 }));
 app.use(express.json());
