@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: coinbase-clone-server
+    runtime: node
+    rootDir: server
+    buildCommand: pnpm install --prod
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: JWT_ACCESS_EXPIRES
+        value: 15m
+      - key: JWT_REFRESH_EXPIRES
+        value: 7d
+      - key: CLIENT_URL
+        sync: false
