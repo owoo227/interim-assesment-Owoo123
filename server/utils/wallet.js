@@ -1,19 +1,14 @@
 const crypto = require('crypto');
 
-const DEFAULT_ASSETS = ['BTC', 'ETH', 'SOL', 'USDT'];
-
-const MOCK_BALANCES = {
-  BTC: 0.05,
-  ETH: 1.2,
-  SOL: 10,
-  USDT: 500,
+const ADDRESS_PREFIXES = {
+  BTC: '1', ETH: '0x', SOL: '', USDT: '0x', BNB: '0x',
+  XRP: 'r', ADA: 'addr1', DOT: '1', LTC: 'L', AVAX: '0x',
 };
 
 const generateMockAddress = (asset) => {
-  const prefixes = { BTC: '1', ETH: '0x', SOL: '', USDT: '0x' };
-  const prefix = prefixes[asset] || '';
-  const random = crypto.randomBytes(16).toString('hex');
+  const prefix = ADDRESS_PREFIXES[asset] ?? '';
+  const random = crypto.randomBytes(20).toString('hex');
   return `${prefix}${random}`;
 };
 
-module.exports = { DEFAULT_ASSETS, MOCK_BALANCES, generateMockAddress };
+module.exports = { generateMockAddress };

@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const RefreshToken = require('../models/RefreshToken');
 const Wallet = require('../models/Wallet');
+const Crypto = require('../models/Crypto');
 const {
   generateAccessToken,
   generateRefreshToken,
@@ -10,16 +11,20 @@ const {
   generateResetToken,
   REFRESH_COOKIE_OPTIONS,
 } = require('../utils/token');
-const { DEFAULT_ASSETS, MOCK_BALANCES, generateMockAddress } = require('../utils/wallet');
+const { generateMockAddress } = require('../utils/wallet');
 
 const createDefaultWallets = async (userId) => {
-  const wallets = DEFAULT_ASSETS.map((asset) => ({
+  const coins = await Crypto.find({}, 'symbol').lean();
+  if (!coins.length) return;
+
+  const wallets = coins.map((coin) => ({
     userId,
-    asset,
-    balance: MOCK_BALANCES[asset] || 0,
-    address: generateMockAddress(asset),
+    asset:   coin.symbol,
+    balance: 0,
+    address: generateMockAddress(coin.symbol),
   }));
-  await Wallet.insertMany(wallets);
+
+  await Wallet.insertMany(wallets, { ordered: false });
 };
 
 const register = async (req, res) => {

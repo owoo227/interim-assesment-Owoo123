@@ -2,8 +2,25 @@ const Wallet = require('../models/Wallet');
 const Crypto = require('../models/Crypto');
 const { generateMockAddress } = require('../utils/wallet');
 
+const syncWalletsForUser = async (userId) => {
+  const [allCoins, existingWallets] = await Promise.all([
+    Crypto.find({}, 'symbol').lean(),
+    Wallet.find({ userId }, 'asset').lean(),
+  ]);
+  const existingSet = new Set(existingWallets.map((w) => w.asset));
+  const missing = allCoins.filter((c) => !existingSet.has(c.symbol));
+  if (!missing.length) return;
+
+  await Wallet.insertMany(
+    missing.map((c) => ({ userId, asset: c.symbol, balance: 0, address: generateMockAddress(c.symbol) })),
+    { ordered: false }
+  );
+};
+
 const getBalances = async (req, res) => {
   try {
+    await syncWalletsForUser(req.user._id);
+
     const wallets = await Wallet.find({ userId: req.user._id });
 
     const symbols = wallets.map((w) => w.asset);
