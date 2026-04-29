@@ -3,12 +3,12 @@ const Crypto = require('../models/Crypto');
 const { generateMockAddress } = require('../utils/wallet');
 
 const syncWalletsForUser = async (userId) => {
-  const [allCoins, existingWallets] = await Promise.all([
-    Crypto.find({}, 'symbol').lean(),
-    Wallet.find({ userId }, 'asset').lean(),
+  const [seededCoins, existingWallets] = await Promise.all([
+    Crypto.find({ createdBy: null }, 'symbol').lean(),
+    Wallet.find({ userId, isCustom: { $ne: true } }, 'asset').lean(),
   ]);
   const existingSet = new Set(existingWallets.map((w) => w.asset));
-  const missing = allCoins.filter((c) => !existingSet.has(c.symbol));
+  const missing = seededCoins.filter((c) => !existingSet.has(c.symbol));
   if (!missing.length) return;
 
   await Wallet.insertMany(
@@ -101,11 +101,13 @@ const getPortfolioSummary = async (req, res) => {
       ? parseFloat((weightedChange / totalBalance).toFixed(4))
       : 0;
 
+    const holdings = breakdown.filter((b) => b.balance > 0);
+
     res.json({
       totalBalance: parseFloat(totalBalance.toFixed(2)),
       change24h,
-      assetCount: wallets.length,
-      breakdown,
+      assetCount: holdings.length,
+      breakdown:  holdings,
     });
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -1,6 +1,7 @@
 const express = require('express');
 const { body } = require('express-validator');
 const { validate } = require('../middleware/validate.middleware');
+const { protect } = require('../middleware/auth.middleware');
 const { getAllCrypto, getGainers, getNewListings, addCrypto } = require('../controllers/crypto.controller');
 
 const router = express.Router();
@@ -11,6 +12,7 @@ router.get('/new', getNewListings);
 
 router.post(
   '/',
+  protect,
   [
     body('name').trim().notEmpty().withMessage('Name is required'),
     body('symbol').trim().notEmpty().withMessage('Symbol is required'),

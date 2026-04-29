@@ -81,4 +81,24 @@ const submitKyc = async (req, res) => {
   }
 };
 
-module.exports = { getKycStatus, uploadId, uploadAddress, submitKyc };
+const completeKyc = async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { kycStatus: 'approved' },
+      { new: true }
+    );
+
+    // Mark the KYC document as approved too if it exists
+    await KycDocument.findOneAndUpdate(
+      { userId: req.user._id },
+      { status: 'approved' },
+    );
+
+    res.json({ kycStatus: user.kycStatus, message: 'KYC verified successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { getKycStatus, uploadId, uploadAddress, submitKyc, completeKyc };
