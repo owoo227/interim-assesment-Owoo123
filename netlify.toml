@@ -1,6 +1,10 @@
 [build]
   base = "frontend"
+<<<<<<< HEAD
   publish = "dist"
+=======
+  publish = "frontend/dist"
+>>>>>>> upstream/main
   command = "pnpm install && pnpm build"
 
 [[redirects]]
