@@ -10,6 +10,8 @@ export default defineConfig(({ mode }) => {
   const proxyEntry = (target) => ({ target, changeOrigin: true });
 
   return {
+    // Use relative base so built assets are referenced correctly on Netlify
+    base: './',
     plugins: [react(), tailwindcss()],
     resolve: {
       dedupe: ['react', 'react-dom'],
