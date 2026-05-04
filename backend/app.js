@@ -19,6 +19,11 @@ const { body } = require('express-validator');
 
 const app = express();
 
+// Root route for quick manual verification (Render URL)
+app.get('/', (_req, res) => {
+  res.status(200).send('Server running on /');
+});
+
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:5173',
   credentials: true,
