@@ -4,7 +4,7 @@
   "description": "Node.js + Express + MongoDB backend for Coinbase Clone",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "bash ./start.sh",
     "start:render": "pnpm install && node server.js",
     "dev": "nodemon server.js"
   },
